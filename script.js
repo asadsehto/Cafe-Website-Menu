@@ -1,22 +1,31 @@
-fetch('https://spreadsheets.google.com/feeds/list/1bbk91PpCKNeC9xi_2qdyRofUgHZPQspqNM2D8Q1JPok/od6/public/values?alt=json')
-    .then(response => response.json())
-    .then(data => {
-        const entries = data.feed.entry;
-        const menuContainer = document.getElementById('menu-container'); // Make sure you have this div in your HTML
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCtNjAKEulqQwlYWuedvr1jq0Pozl_yaqA",
+  authDomain: "cafe-app-684ad.firebaseapp.com",
+  projectId: "cafe-app-684ad",
+  storageBucket: "cafe-app-684ad.firebasestorage.app",
+  messagingSenderId: "191008909640",
+  appId: "1:191008909640:web:665b02b7dcc46d1b6f2b7d",
+  measurementId: "G-1JBKQW19XL"
+};
 
-        entries.forEach((entry) => {
-            const imgUrl = entry.gsx$uploadimage.$t;  // Update column name for the image URL
-            const timestamp = entry.gsx$timestamp.$t;  // Timestamp (optional)
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore(app);
 
-            const img = document.createElement('img');
-            img.src = imgUrl;  // Set the image source from the sheet
-            img.alt = "Today's Menu";  // Set alt text for the image
+// Function to display menu from Firestore
+const menuList = document.getElementById('menu-list');
 
-            const menuText = document.createElement('div');
-            menuText.textContent = "Menu Uploaded on: " + timestamp;  // Display the timestamp or any description
-
-            menuContainer.appendChild(img);
-            menuContainer.appendChild(menuText);
-        });
-    })
-    .catch(error => console.error('Error fetching data:', error));
+// Fetch menu items from Firestore
+db.collection('menu').get()
+  .then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `<strong>${data.timestamp}</strong><br><img src="${data.image_url}" alt="menu item" style="width: 100px; height: auto;">`;
+      menuList.appendChild(listItem);
+    });
+  })
+  .catch((error) => {
+    console.error('Error fetching data: ', error);
+  });
