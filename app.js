@@ -10,22 +10,28 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore(app);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Function to display menu from Firestore
 const menuList = document.getElementById('menu-list');
 
 // Fetch menu items from Firestore
-db.collection('menu').get()
-  .then((querySnapshot) => {
+async function fetchMenu() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "menu"));
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const listItem = document.createElement('li');
       listItem.innerHTML = `<strong>${data.timestamp}</strong><br><img src="${data.image_url}" alt="menu item" style="width: 100px; height: auto;">`;
       menuList.appendChild(listItem);
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('Error fetching data: ', error);
-  });
+  }
+}
+
+fetchMenu();
