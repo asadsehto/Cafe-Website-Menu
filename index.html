@@ -6,8 +6,44 @@
   <title>Cafe Menu</title>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script type="module">
+    // Firebase SDK Imports (ES Modules)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCtNjAKEulqQwlYWuedvr1jq0Pozl_yaqA",
+      authDomain: "cafe-app-684ad.firebaseapp.com",
+      projectId: "cafe-app-684ad",
+      storageBucket: "cafe-app-684ad.firebasestorage.app",
+      messagingSenderId: "191008909640",
+      appId: "1:191008909640:web:665b02b7dcc46d1b6f2b7d",
+      measurementId: "G-1JBKQW19XL"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to fetch menu items from Firestore and display them
+    const menuList = document.getElementById('menu-list');
+
+    async function fetchMenu() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "menu"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `<strong>${data.timestamp}</strong><br><img src="${data.image_url}" alt="menu item" style="width: 100px; height: auto;">`;
+          menuList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    }
+
+    fetchMenu();
+  </script>
 
   <style>
     body {
@@ -38,9 +74,6 @@
   <h1>Cafe Menu</h1>
 
   <ul id="menu-list"></ul>
-
-  <!-- Link to external JavaScript file (set to module) -->
-  <script type="module" src="app.js"></script>
 
 </body>
 </html>
